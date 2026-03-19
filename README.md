@@ -209,8 +209,8 @@ flowchart TB
 
     subgraph Connectors["Exchange Connectors"]
         M[Bybit]
-        N[Binance (planned)]
-        O[Coinbase (planned)]
+        N["Binance (planned)"]      <!-- Fixed: quotes around label -->
+        O["Coinbase (planned)"]     <!-- Fixed: quotes around label -->
         P[Your Connector]
     end
 
