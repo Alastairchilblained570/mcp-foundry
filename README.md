@@ -6,18 +6,41 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)]()
 [![UTI Version](https://img.shields.io/badge/UTI-v0.1.0-orange.svg)](docs/uti_specification.md)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
+---
+
+## 📋 Table of Contents
+
+- [The Problem](#the-problem)
+- [The Solution](#the-solution)
+- [What's Included](#whats-included)
+- [Quick Start](#quick-start)
+- [Using Docker](#using-docker)
+- [Running Tests](#running-tests)
+- [Architecture](#architecture)
+- [Building a New Connector](#building-a-new-connector)
+- [Project Roadmap](#project-roadmap)
+- [Contributing](#contributing)
+- [Enterprise and Institutional Use](#enterprise-and-institutional-use)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
 
 ---
 
 ## The Problem
 
-Every AI agent that wants to trade needs custom integration code for every exchange. Every exchange has its own API, its own data formats, its own quirks. If you have **M** agents and **N** exchanges, you end up writing **M x N** integrations — and maintaining all of them.
+Every AI agent that wants to trade needs custom integration code for every exchange. Every exchange has its own API, its own data formats, its own quirks. If you have **M** agents and **N** exchanges, you end up writing **M × N** integrations — and maintaining all of them.
 
 This doesn't scale. It's the same problem USB solved for hardware peripherals, and the same problem that HTTP solved for networked applications.
+
+---
 
 ## The Solution
 
 The **Universal Trading Interface (UTI)** is an open standard that sits between AI agents and financial markets. Write your agent once, connect it to any exchange.
+
+Instead of M × N integrations, you get **M + N** — each agent implements the UTI once, each exchange gets one connector, and everything just works.
 
 ```
 ┌─────────────┐     ┌─────────────────┐     ┌──────────────┐
@@ -31,7 +54,7 @@ The **Universal Trading Interface (UTI)** is an open standard that sits between 
                     Any exchange.
 ```
 
-Instead of M x N integrations, you get **M + N** — each agent implements the UTI once, each exchange gets one connector, and everything just works.
+---
 
 ## What's Included
 
@@ -47,6 +70,8 @@ Instead of M x N integrations, you get **M + N** — each agent implements the U
 | **`examples/`** | Working examples: direct trading, MCP server usage, AI agent integration |
 | **`tests/`** | Comprehensive test suite with mocked connectors |
 | **`docs/`** | Architecture guides, UTI specification, and connector development guide |
+
+---
 
 ## Quick Start
 
@@ -113,6 +138,8 @@ async def main():
 asyncio.run(main())
 ```
 
+---
+
 ## Using Docker
 
 ```bash
@@ -133,6 +160,8 @@ Or with Docker Compose:
 docker-compose up
 ```
 
+---
+
 ## Running Tests
 
 ```bash
@@ -146,30 +175,65 @@ pytest --cov=core --cov=connectors --cov-report=term-missing
 pytest tests/test_trading_engine.py -v
 ```
 
+---
+
 ## Architecture
 
-The project follows a layered architecture designed for extensibility:
+The project follows a layered architecture designed for extensibility. The diagram below illustrates the flow of requests and the separation of concerns.
 
+```mermaid
+flowchart TB
+    subgraph Agents["AI Agents"]
+        A[Claude / GPT]
+        B[LangChain]
+        C[Custom Python]
+    end
+
+    subgraph Server["MCP Server (REST API)"]
+        D[FastAPI]
+        E[Tool Discovery]
+        F[Authentication]
+    end
+
+    subgraph Engine["Trading Engine + Risk Manager"]
+        G[Strategy Execution]
+        H[Position Sizing]
+        I[Exposure Limits]
+        J[Daily Loss Caps]
+    end
+
+    subgraph UTI["Universal Trading Interface"]
+        K[Data Models]
+        L[Protocol Contract]
+    end
+
+    subgraph Connectors["Exchange Connectors"]
+        M[Bybit]
+        N[Binance (planned)]
+        O[Coinbase (planned)]
+        P[Your Connector]
+    end
+
+    Agents --> Server
+    Server --> Engine
+    Engine --> UTI
+    UTI --> Connectors
+    Connectors --> Q[Exchanges]
 ```
-┌──────────────────────────────────────────────────┐
-│                   AI Agents                       │
-│          (Claude, GPT, LangChain, custom)         │
-├──────────────────────────────────────────────────┤
-│              MCP Server (REST API)                │
-│         Tool discovery, authentication            │
-├──────────────────────────────────────────────────┤
-│         Trading Engine + Risk Manager             │
-│    Strategy execution, position sizing, limits    │
-├──────────────────────────────────────────────────┤
-│          Universal Trading Interface              │
-│     The contract — data models + protocol         │
-├──────────────────────────────────────────────────┤
-│              Exchange Connectors                  │
-│        Bybit │ (your connector here)              │
-└──────────────────────────────────────────────────┘
-```
+
+**Layers explained:**
+
+- **AI Agents** – Any LLM or traditional agent that can make HTTP calls.
+- **MCP Server** – REST API layer that exposes trading tools to agents. Handles authentication and tool discovery.
+- **Trading Engine + Risk Manager** – Core business logic: executes strategies, enforces risk rules before orders reach the exchange.
+- **Universal Trading Interface** – The heart of the system: a set of abstract classes and data models that all connectors must implement.
+- **Exchange Connectors** – Concrete implementations for each exchange (Bybit, Binance, etc.). They translate UTI calls into exchange-specific API requests.
+
+This architecture ensures that adding a new exchange never requires changes to the agents, server, or risk engine. You simply write a new connector that implements the UTI.
 
 For a deeper dive, see [docs/architecture.md](docs/architecture.md).
+
+---
 
 ## Building a New Connector
 
@@ -183,19 +247,23 @@ We designed the UTI to make adding new exchanges straightforward. The full guide
 
 The Bybit connector (`connectors/bybit.py`) is the reference implementation — use it as your template.
 
+---
+
 ## Project Roadmap
 
 We're building this in the open, and we'd love your input on what matters most.
 
 | Phase | Status | Description |
 | :--- | :--- | :--- |
-| UTI v0.1 | Done | Core specification, data models, Bybit connector |
-| MCP Server | Done | REST API with tool discovery, risk management |
-| WebSocket Support | Planned | Real-time market data streaming |
-| Additional Connectors | Planned | Binance, Coinbase, Kraken, Interactive Brokers |
-| Enterprise Add-ons | Planned | Proprietary connectors (SAP, Bloomberg), advanced algos |
-| Hosted Gateway | Planned | Managed cloud service with credential vault and audit logs |
-| UTI v1.0 | Planned | Stable specification after community feedback |
+| UTI v0.1 | ✅ Done | Core specification, data models, Bybit connector |
+| MCP Server | ✅ Done | REST API with tool discovery, risk management |
+| WebSocket Support | 🚧 Planned | Real-time market data streaming |
+| Additional Connectors | 🚧 Planned | Binance, Coinbase, Kraken, Interactive Brokers |
+| Enterprise Add-ons | 📅 Planned | Proprietary connectors (SAP, Bloomberg), advanced algos |
+| Hosted Gateway | 📅 Planned | Managed cloud service with credential vault and audit logs |
+| UTI v1.0 | 📅 Planned | Stable specification after community feedback |
+
+---
 
 ## Contributing
 
@@ -208,15 +276,21 @@ The most impactful contributions right now:
 - **Documentation** — tutorials, guides, translations
 - **Feedback on the UTI design** — we want this to be a community standard
 
+---
+
 ## Enterprise and Institutional Use
 
 The open-source core is designed to be production-ready for individual developers and small teams. For organisations with advanced requirements — regulatory compliance, legacy system integration, advanced execution algorithms, or managed infrastructure — we offer enterprise solutions.
 
 See [enterprise/README.md](enterprise/README.md) and [gateway/README.md](gateway/README.md) for details, or reach out at **enterprise@mcpfoundry.dev**.
 
+---
+
 ## License
 
 This project is licensed under the [Apache License 2.0](LICENSE) — use it freely in personal and commercial projects.
+
+---
 
 ## Acknowledgements
 
